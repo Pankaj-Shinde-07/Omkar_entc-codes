@@ -45,6 +45,17 @@ let activeFile = null;
 let currentText = '';
 let toastTimer;
 
+const syntax = {
+  C: {
+    keywords: new Set(['auto', 'break', 'case', 'char', 'const', 'continue', 'default', 'do', 'else', 'enum', 'extern', 'for', 'goto', 'if', 'long', 'register', 'return', 'short', 'signed', 'sizeof', 'static', 'struct', 'switch', 'typedef', 'union', 'unsigned', 'void', 'volatile', 'while']),
+    types: new Set(['int', 'float', 'double', 'sfr', 'sbit', 'bit', 'code', 'data', 'idata', 'xdata', 'pdata']),
+  },
+  Verilog: {
+    keywords: new Set(['always', 'and', 'assign', 'begin', 'buf', 'case', 'casex', 'casez', 'deassign', 'default', 'disable', 'else', 'end', 'endcase', 'endfunction', 'endmodule', 'endtask', 'for', 'forever', 'fork', 'function', 'if', 'initial', 'join', 'negedge', 'or', 'parameter', 'posedge', 'repeat', 'release', 'repeat', 'reg', 'signed', 'task', 'time', 'wait', 'while', 'wire']),
+    types: new Set(['input', 'output', 'inout', 'integer', 'logic', 'localparam', 'real', 'realtime', 'tri', 'tri0', 'tri1', 'wand', 'wor']),
+  },
+};
+
 function encodePath(path) {
   return path.split('/').map(encodeURIComponent).join('/');
 }
@@ -55,6 +66,16 @@ function visibleFiles() {
     const matchesGroup = activeFilter === 'all' || file.group === activeFilter;
     const matchesSearch = !query || `${file.path} ${file.label} ${file.language}`.toLowerCase().includes(query);
     return matchesGroup && matchesSearch;
+  });
+}
+
+function updateCounts() {
+  document.querySelector('[data-stat="files"]').textContent = String(files.length).padStart(2, '0');
+  document.querySelectorAll('.filter-button').forEach((button) => {
+    const count = button.dataset.filter === 'all'
+      ? files.length
+      : files.filter((file) => file.group === button.dataset.filter).length;
+    button.lastElementChild.textContent = String(count);
   });
 }
 
@@ -112,10 +133,110 @@ function setMessage(message, kind = '') {
   copyButton.disabled = true;
 }
 
-function drawCode(text) {
+function addToken(parent, text, kind = '') {
+  if (!text) return;
+  if (!kind) {
+    parent.append(document.createTextNode(text));
+    return;
+  }
+  const token = document.createElement('span');
+  token.className = `token-${kind}`;
+  token.textContent = text;
+  parent.append(token);
+}
+
+function highlightLine(target, line, language, state) {
+  const rules = syntax[language];
+  if (!rules) {
+    target.textContent = line || ' ';
+    return;
+  }
+
+  let index = 0;
+  let plain = '';
+  const flushPlain = () => {
+    addToken(target, plain);
+    plain = '';
+  };
+  const addTyped = (value, kind) => {
+    flushPlain();
+    addToken(target, value, kind);
+    index += value.length;
+  };
+
+  while (index < line.length) {
+    const rest = line.slice(index);
+
+    if (state.inBlockComment) {
+      const end = rest.indexOf('*/');
+      if (end === -1) {
+        addTyped(rest, 'comment');
+        break;
+      }
+      addTyped(rest.slice(0, end + 2), 'comment');
+      state.inBlockComment = false;
+      continue;
+    }
+
+    if (rest.startsWith('//')) {
+      addTyped(rest, 'comment');
+      break;
+    }
+    if (rest.startsWith('/*')) {
+      state.inBlockComment = true;
+      continue;
+    }
+
+    const first = line[index];
+    if (first === '"' || first === "'") {
+      let end = index + 1;
+      while (end < line.length) {
+        if (line[end] === '\\') { end += 2; continue; }
+        if (line[end] === first) { end += 1; break; }
+        end += 1;
+      }
+      addTyped(line.slice(index, end), 'string');
+      continue;
+    }
+
+    if (first === '#' && language === 'C') {
+      const directive = rest.match(/^#[A-Za-z_]\w*/);
+      if (directive) { addTyped(directive[0], 'preprocessor'); continue; }
+    }
+
+    const numeric = rest.match(language === 'Verilog'
+      ? /^(?:\d+'[sS]?[bBoOdDhH][0-9a-fA-F_xXzZ?]+|\d+(?:\.\d+)?)/
+      : /^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)(?:[uUlLfF]+)?/);
+    if (numeric) { addTyped(numeric[0], 'number'); continue; }
+
+    if (language === 'Verilog' && first === '`') {
+      const macro = rest.match(/^`[A-Za-z_]\w*/);
+      if (macro) { addTyped(macro[0], 'preprocessor'); continue; }
+    }
+
+    const identifier = rest.match(/^[A-Za-z_$][\w$]*/);
+    if (identifier) {
+      const word = identifier[0];
+      const kind = rules.keywords.has(word) ? 'keyword' : rules.types.has(word) ? 'type' : '';
+      if (kind) { addTyped(word, kind); continue; }
+      plain += word;
+      index += word.length;
+      continue;
+    }
+
+    plain += first;
+    index += 1;
+  }
+
+  flushPlain();
+  if (line.length === 0) addToken(target, ' ');
+}
+
+function drawCode(text, language) {
   codeContent.replaceChildren();
   const lines = text.replace(/\r\n/g, '\n').split('\n');
   const fragment = document.createDocumentFragment();
+  const state = { inBlockComment: false };
   lines.forEach((line, index) => {
     const row = document.createElement('span');
     row.className = 'code-line';
@@ -125,7 +246,7 @@ function drawCode(text) {
     number.textContent = String(index + 1).padStart(3, '0');
     const value = document.createElement('span');
     value.className = 'line-text';
-    value.textContent = line || ' ';
+    highlightLine(value, line, language, state);
     row.append(number, value);
     fragment.append(row);
   });
@@ -155,6 +276,7 @@ async function openFile(file) {
   selectedName.textContent = file.label;
   fileKind.textContent = file.group === 'micro' ? 'MICROCONTROLLER / KEIL' : 'DIGITAL LOGIC / VLSI';
   badge.textContent = file.language;
+  badge.dataset.language = file.language;
   sourceLink.href = `https://github.com/Pankaj-Shinde-07/Omkar_entc-codes/blob/main/${encodePath(file.path)}`;
   sourceLink.setAttribute('aria-label', `Open ${file.path} on GitHub`);
   setMessage('Loading source…');
@@ -168,7 +290,7 @@ async function openFile(file) {
     if (currentText.length === 0) {
       setMessage('This file is empty in the uploaded archive.', 'empty');
     } else {
-      drawCode(currentText);
+      drawCode(currentText, file.language);
     }
   } catch (error) {
     if (activeFile?.path !== file.path) return;
@@ -219,4 +341,5 @@ document.addEventListener('keydown', (event) => {
 });
 
 renderList();
+updateCounts();
 openFile(files[0]);

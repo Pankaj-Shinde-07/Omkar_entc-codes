@@ -10,6 +10,7 @@
     <script src="assets/site.js" defer></script>
   </head>
   <body>
+    <a class="skip-link" href="#archive">Skip to the code browser</a>
     <div class="site-shell">
       <header class="hero">
         <div class="hero-top">
@@ -26,9 +27,9 @@
         <div class="hero-copy">
           <p class="eyebrow"><span class="eyebrow-line"></span> LAB CODE ARCHIVE</p>
           <h1>Omkar ENTC<br><span>Codes.</span></h1>
-          <p class="hero-description">A simple, searchable home for microcontroller experiments and digital logic designs.</p>
+          <p class="hero-description">A searchable field guide to 8051 microcontroller programs and Verilog logic designs.</p>
           <div class="hero-stats" aria-label="Archive summary">
-            <div><strong>24</strong><span>source files</span></div>
+            <div><strong data-stat="files">24</strong><span>source files</span></div>
             <div><strong>02</strong><span>collections</span></div>
             <div><strong>01</strong><span>code browser</span></div>
           </div>
@@ -68,7 +69,7 @@
               <span id="result-count" aria-live="polite">24 files</span>
             </div>
             <div class="file-list" id="file-list" role="listbox" aria-label="Code files"></div>
-            <p class="library-note"><span aria-hidden="true">⌘</span> Source files stay in the repository and load on demand.</p>
+            <p class="library-note"><span aria-hidden="true">TIP</span> Press <kbd>/</kbd> to search. Select any file to preview it.</p>
           </aside>
 
           <section class="code-panel" aria-label="Selected source file">
@@ -84,7 +85,7 @@
                 <p class="file-kind" id="file-kind">SOURCE FILE</p>
                 <h3 id="selected-name">Choose a file</h3>
               </div>
-              <span class="language-badge" id="language-badge">—</span>
+              <span class="language-badge" id="language-badge" data-language="">—</span>
             </div>
             <div class="code-wrap" id="code-wrap">
               <div class="code-message" id="code-message" role="status">Select a file from the library to view its contents.</div>
