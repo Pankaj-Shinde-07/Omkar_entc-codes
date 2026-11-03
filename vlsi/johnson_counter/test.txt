@@ -1,0 +1,34 @@
+module johnson_counter_tb;
+
+reg clk;
+reg reset;
+wire [3:0] Q;
+
+// Instantiate Johnson Counter
+johnson_counter uut(
+    .clk(clk),
+    .reset(reset),
+    .Q(Q)
+);
+
+// Clock generation
+initial begin
+    clk = 0;
+    forever #5 clk = ~clk;
+end
+
+// Test sequence
+initial begin
+    $monitor("Time=%0t | Reset=%b | Q=%b",
+              $time, reset, Q);
+
+    reset = 1;
+    #10;
+
+    reset = 0;
+    #100;
+
+    $finish;
+end
+
+endmodule

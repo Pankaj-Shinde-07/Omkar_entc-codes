@@ -1,0 +1,18 @@
+module up_down_counter (
+    input clk,
+    input reset,
+    input mode,
+    output reg [2:0] q
+);
+
+always @(posedge clk or posedge reset)
+begin
+    if (reset)
+        q <= 3'b000;
+    else if (mode == 1'b1)
+        q <= q + 1'b1;   // Up counter
+    else
+        q <= q - 1'b1;   // Down counter
+end
+
+endmodule

@@ -1,0 +1,48 @@
+`timescale 1ns/1ps
+
+module tb_up_down_counter;
+
+reg clk;
+reg reset;
+reg mode;
+wire [2:0] q;
+
+// Instantiate the counter
+up_down_counter uut (
+    .clk(clk),
+    .reset(reset),
+    .mode(mode),
+    .q(q)
+);
+
+// Clock generation: 10 ns period
+always #5 clk = ~clk;
+
+initial begin
+    clk = 0;
+    reset = 1;
+    mode = 1;
+
+    // Apply reset
+    #10;
+    reset = 0;
+
+    // Test UP counter
+    mode = 1;
+    #80;
+
+    // Test DOWN counter
+    mode = 0;
+    #80;
+
+    // Finish simulation
+    $finish;
+end
+
+// Display output
+initial begin
+    $monitor("Time=%0t | Reset=%b | Mode=%b | Q=%b",
+             $time, reset, mode, q);
+end
+
+endmodule
