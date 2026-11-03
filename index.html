@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101917">
+    <meta name="description" content="Browse Omkar's microcontroller and VLSI lab code examples.">
+    <title>Omkar ENTC Codes</title>
+    <link rel="stylesheet" href="assets/site.css">
+    <script src="assets/site.js" defer></script>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="hero">
+        <div class="hero-top">
+          <a class="wordmark" href="./" aria-label="Omkar ENTC Codes home">
+            <span class="wordmark-mark" aria-hidden="true">O</span>
+            <span>OMKAR <span class="wordmark-muted">/ ENTC</span></span>
+          </a>
+          <a class="github-link" href="https://github.com/Pankaj-Shinde-07/Omkar_entc-codes" target="_blank" rel="noreferrer">
+            <span class="github-dot" aria-hidden="true"></span>
+            View repository <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-line"></span> LAB CODE ARCHIVE</p>
+          <h1>Omkar ENTC<br><span>Codes.</span></h1>
+          <p class="hero-description">A simple, searchable home for microcontroller experiments and digital logic designs.</p>
+          <div class="hero-stats" aria-label="Archive summary">
+            <div><strong>24</strong><span>source files</span></div>
+            <div><strong>02</strong><span>collections</span></div>
+            <div><strong>01</strong><span>code browser</span></div>
+          </div>
+        </div>
+        <div class="hero-orbit orbit-one" aria-hidden="true"></div>
+        <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="hero-index" aria-hidden="true">ENTC<br>ARCHIVE<br><span>2026</span></div>
+      </header>
+
+      <main class="archive" id="archive">
+        <section class="archive-heading" aria-labelledby="archive-title">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-line"></span> THE LIBRARY</p>
+            <h2 id="archive-title">Browse the code</h2>
+          </div>
+          <p class="archive-intro">Pick a file to read it here. Search by project, filename, or folder.</p>
+        </section>
+
+        <section class="browser" aria-label="Code archive browser">
+          <aside class="library-panel" aria-label="File library">
+            <div class="library-controls">
+              <label class="search-box">
+                <span class="search-icon" aria-hidden="true">⌕</span>
+                <span class="visually-hidden">Search files</span>
+                <input id="search" type="search" placeholder="Search files…" autocomplete="off">
+                <kbd>/</kbd>
+              </label>
+              <div class="filters" role="group" aria-label="Filter by collection">
+                <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">All <span>24</span></button>
+                <button class="filter-button" type="button" data-filter="micro" aria-pressed="false">Microcontroller <span>10</span></button>
+                <button class="filter-button" type="button" data-filter="vlsi" aria-pressed="false">VLSI <span>14</span></button>
+              </div>
+            </div>
+            <div class="file-list-header">
+              <span>PROJECT FILES</span>
+              <span id="result-count" aria-live="polite">24 files</span>
+            </div>
+            <div class="file-list" id="file-list" role="listbox" aria-label="Code files"></div>
+            <p class="library-note"><span aria-hidden="true">⌘</span> Source files stay in the repository and load on demand.</p>
+          </aside>
+
+          <section class="code-panel" aria-label="Selected source file">
+            <div class="code-toolbar">
+              <div class="breadcrumbs" id="breadcrumbs" aria-label="Selected file path"></div>
+              <div class="code-actions">
+                <a class="source-link" id="source-link" href="#" target="_blank" rel="noreferrer">Open source <span aria-hidden="true">↗</span></a>
+                <button class="copy-button" id="copy-button" type="button" disabled><span aria-hidden="true">▢</span> Copy</button>
+              </div>
+            </div>
+            <div class="file-summary">
+              <div>
+                <p class="file-kind" id="file-kind">SOURCE FILE</p>
+                <h3 id="selected-name">Choose a file</h3>
+              </div>
+              <span class="language-badge" id="language-badge">—</span>
+            </div>
+            <div class="code-wrap" id="code-wrap">
+              <div class="code-message" id="code-message" role="status">Select a file from the library to view its contents.</div>
+              <pre class="code-view" id="code-view" hidden><code id="code-content"></code></pre>
+            </div>
+            <div class="code-footer">
+              <span id="line-count">READY</span>
+              <span>READ ONLY <span class="footer-dot">●</span></span>
+            </div>
+          </section>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>OMKAR ENTC CODES</span>
+        <span>Built for learning <span class="footer-dot">●</span> Hosted on GitHub Pages</span>
+        <a href="https://github.com/Pankaj-Shinde-07/Omkar_entc-codes" target="_blank" rel="noreferrer">Source repository ↗</a>
+      </footer>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
