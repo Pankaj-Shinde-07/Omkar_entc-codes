@@ -15,6 +15,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html { min-width: 320px; background: #101715; scroll-behavior: smooth; }
 
